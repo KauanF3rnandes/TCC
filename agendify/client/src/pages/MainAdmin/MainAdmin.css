@@ -1,0 +1,34 @@
+div .form-ctnr {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 8%; 
+
+}
+
+div .form-ctnr .form-format {
+    width: 40%;
+    height: 40%;
+}
+
+div .form-ctnr .form-format h2 {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+
+@media screen and (max-width: 768px) {
+    div .form-ctnr .form-format {
+        width: 50%;
+        height: 50%;
+    }
+
+    div .form-ctnr .form-format h2 {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+  }

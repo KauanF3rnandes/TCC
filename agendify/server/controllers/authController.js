@@ -41,10 +41,7 @@ const register = (req, res) => {
 const login = async (req, res) => {
     const { email, senha } = req.body;
 
-    console.log("Recebido login request para o email:", email);
-
     if (!email || !senha) {
-        console.log("Email ou senha não fornecidos");
         return res.status(400).send({ success: false, msg: "Email e senha são obrigatórios" });
     }
 
@@ -67,8 +64,6 @@ const login = async (req, res) => {
         }
 
         const user = result[0];
-        console.log("Usuário encontrado:", user);
-        console.log("Senha armazenada no banco de dados:", user.Senha); 
 
         if (!user.Senha) {
             console.log("Senha no banco de dados é inválida ou não fornecida");
@@ -76,7 +71,6 @@ const login = async (req, res) => {
         }
 
         const match = await bcrypt.compare(senha, user.Senha);
-        console.log("Resultado da comparação de senha:", match);
 
         if (match) {
             const userType = user.TipoUsuario.toLowerCase();
@@ -86,8 +80,6 @@ const login = async (req, res) => {
                 email: user.Email,
                 tipoUsuario: userType,
             };
-
-            console.log("Usuário logado com sucesso:", userData);
 
             const token = jwt.sign({ id: user.UsuarioID, role: user.TipoUsuario }, SECRET_KEY, { expiresIn: '1h' });
             return res.send({ success: true, msg: "Usuário logado com sucesso", token, user: userData });

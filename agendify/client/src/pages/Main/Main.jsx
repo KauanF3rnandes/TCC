@@ -99,9 +99,6 @@ const Main = () => {
             <div>
                 <Sidebar />
             </div>
-            <div className="category">
-                <h1>MARCAR AGENDAMENTO</h1>
-            </div>
             <div className="container-main">
                 <div className="content">
                     <img src={agenda} alt="logo de calendario" />

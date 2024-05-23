@@ -14,7 +14,6 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [error, setError] = useState('');
     const [msg, setMsg] = useState('');
-    const [tipoUsuario, setTipoUsuario] = useState('');
 
     const handleClick = () => setShow(!show);
 
@@ -23,7 +22,6 @@ const Register = () => {
             email: email,
             nome: nome,
             senha: senha,
-            tipoUsuario: tipoUsuario
         };
         axios.post("http://localhost:3001/auth/register", userData)
             .then((response) => {
@@ -53,11 +51,11 @@ const Register = () => {
     };
 
     return (
-        <Box className="bgColor">
-            <Center height="100vh">
+        <Box className="bgLogin">
+            <Center className="box-login">
                 <Box className="background-login" display="flex" alignItems="center">
                     <Box mr="2rem">
-                        <Image ml='70px' boxSize='700px' src={loginImage} alt='Login' />
+                        <Image ml='70px' boxSize='500px' src={loginImage} alt='Login' />
                     </Box>
                     <Box>
                         <Box display="flex" flexDirection="column" alignItems="center">
@@ -84,15 +82,6 @@ const Register = () => {
                                         value={nome}
                                         onChange={(e) => setNome(e.target.value)}
                                     />
-                                     <Text mb='2'>tipoUsuario</Text>
-                                        <Input
-                                            placeholder='exemple@exemple.com'
-                                            type='text'
-                                            marginBottom='1rem'
-                                            border='1px'
-                                            value={tipoUsuario}
-                                            onChange={(e) => setTipoUsuario(e.target.value)}
-                                        />
                                     <Text mb='2'>Password</Text>
                                     <InputGroup>
                                         <Input

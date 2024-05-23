@@ -6,6 +6,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { Axios } from "axios";
 import { useToast } from '@chakra-ui/react'
+import { useNavigate } from 'react-router-dom';
 
 
 const RegisterEmpresa = () => {
@@ -18,6 +19,7 @@ const RegisterEmpresa = () => {
     const [cnpj, setCnpj] = useState('');
     const [error, setError] = useState('');
     const [msg, setMsg] = useState('');
+    const navigate = useNavigate();
     const toast = useToast()
 
     const handleClickRegisterEmpresa = () => {
@@ -31,13 +33,21 @@ const RegisterEmpresa = () => {
             .then((response) => {
                 console.log(response);
                 toast({
-                    title: "Cadastro realizado com sucesso.",
+                    title: "Empresa Cadastrada com sucesso.",
                     status: 'success',
                     isClosable: true,
+                    position: 'top-right',
                   });
+                navigate('/');
             })
             .catch((error) => {
                 console.error("Erro ao fazer a solicitação:", error);
+                toast({
+                    title: "Erro ao cadastrar Empresa!",
+                    status: 'error',
+                    isClosable: true,
+                    position: 'top-right',
+                  });
             });
     };
 
@@ -49,35 +59,49 @@ const RegisterEmpresa = () => {
         const cnpjPattern = /^[0-9]{14}$/;  
     
         if (!empresa || !email || !telefone || !cnpj) {
-            setError('Todos os campos são obrigatórios.');
             console.error('Todos os campos são obrigatórios.');
-            setMsg('');
+            toast({
+                title: "Todos os campos são obrigatórios.",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+              });
             return;
         }
     
         if (!emailPattern.test(email)) {
-            setError('Formato de e-mail inválido.');
             console.error('Formato de e-mail inválido.');
-            setMsg('');
+            toast({
+                title: "Formato de e-mail inválido.",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+              });
             return;
         }
     
         if (!telefonePattern.test(telefone)) {
-            setError('Formato de telefone inválido. Deve conter 10 ou 11 dígitos.');
             console.error('Formato de telefone inválido. Deve conter 10 ou 11 dígitos.');
-            setMsg('');
+            toast({
+                title: "Formato de telefone inválido. Deve conter 10 ou 11 dígitos.",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+              });
             return;
         }
     
         if (!cnpjPattern.test(cnpj)) {
-            setError('Formato de CNPJ inválido. Deve conter 14 dígitos.');
             console.error('Formato de CNPJ inválido. Deve conter 14 dígitos.');
-            setMsg('');
+            toast({
+                title: "Formato de CNPJ inválido. Deve conter 14 dígitos.",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+              });
             return;
         }
     
-        setError('');
-        setMsg('Cadastro feito com Sucesso!');
         handleClickRegisterEmpresa();
     };
     
@@ -127,8 +151,6 @@ const RegisterEmpresa = () => {
                         onChange={(e) => setCnpj(e.target.value)}
                         />
                     </FormControl>
-                    {error && <Text color="red">{error}</Text>}
-                    {msg && <Text color="green">{msg}</Text>}
                     <Button onClick={() => {validationRegister()}} type="submit" mt={2} bgColor={"#3a89c9"} colorScheme='blue'>Cadastrar</Button>
                 </div>
             </div>

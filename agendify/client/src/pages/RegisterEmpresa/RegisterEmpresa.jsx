@@ -5,6 +5,7 @@ import logoRegister from '../../img/contratoLogo.avif';
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { Axios } from "axios";
+import { useToast } from '@chakra-ui/react'
 
 
 const RegisterEmpresa = () => {
@@ -17,6 +18,7 @@ const RegisterEmpresa = () => {
     const [cnpj, setCnpj] = useState('');
     const [error, setError] = useState('');
     const [msg, setMsg] = useState('');
+    const toast = useToast()
 
     const handleClickRegisterEmpresa = () => {
         const userData = {
@@ -28,6 +30,11 @@ const RegisterEmpresa = () => {
         axios.post("http://localhost:3001/auth/cadastro_empresa", userData)
             .then((response) => {
                 console.log(response);
+                toast({
+                    title: "Cadastro realizado com sucesso.",
+                    status: 'success',
+                    isClosable: true,
+                  });
             })
             .catch((error) => {
                 console.error("Erro ao fazer a solicitação:", error);

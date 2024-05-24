@@ -187,6 +187,38 @@ const listarHorariosDisponiveis = (req, res) => {
     });
 };
 
+const getUser = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const result = await new Promise((resolve, reject) => {
+            db.query("SELECT * FROM usuarios WHERE UsuarioID = ?", [userId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        if (result.length === 0) {
+            return res.status(404).send({ success: false, msg: "Usuário não encontrado" });
+        }
+
+        const user = result[0];
+        const userData = {
+            id: user.UsuarioID,
+            nome: user.Nome,
+            email: user.Email,
+            tipoUsuario: user.TipoUsuario,
+        };
+
+        res.send({ success: true, user: userData });
+    } catch (err) {
+        console.error("Erro ao buscar usuário:", err);
+        return res.status(500).send({ success: false, error: "Erro ao buscar usuário" });
+    }
+};
+
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
 };
@@ -195,4 +227,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser };

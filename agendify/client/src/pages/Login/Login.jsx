@@ -37,7 +37,9 @@ const Login = () => {
             .then((response) => {
                 if (response.data.success) {
                     const token = response.data.token;
+                    const user = response.data.user;
                     localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(user));
                     toast({
                         title: "Login feito com Sucesso",
                         status: 'success',

@@ -1,12 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./style.css";
-import { Avatar, AvatarBadge, AvatarGroup } from '@chakra-ui/react'
+import { Avatar } from '@chakra-ui/react';
 
 const Header = () => {
+    const [userName, setUserName] = useState('');
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user) {
+            setUserName(user.nome);
+        }
+    }, []);
+
     return (
         <div className="navBar">
             <div className="user">
-                <span>Username</span>
+                <span>{userName}</span>
                 <Avatar className="avatar-logo" src='https://bit.ly/broken-link' />
             </div>
         </div>

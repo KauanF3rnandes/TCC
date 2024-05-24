@@ -5,6 +5,7 @@ import { FormControl, FormLabel, Select, Button } from '@chakra-ui/react';
 import { Input, Center, Spinner } from '@chakra-ui/react';
 import './MainAdmin.css';
 import axios from 'axios';
+import { useToast } from '@chakra-ui/react';
 
 const MainAdmin = () => {
     const [loading, setLoading] = useState(true);
@@ -12,6 +13,8 @@ const MainAdmin = () => {
     const [data, setData] = useState('');
     const [horario, setHorario] = useState('');
     const [empresaId, setEmpresaId] = useState('');
+    const toast = useToast()
+
 
     useEffect(() => {
         const loadData = async () => {
@@ -37,11 +40,26 @@ const MainAdmin = () => {
             horario
         })
         .then(response => {
-            alert(response.data);
+            console.log(response.data);
+            toast({
+                title: "Horário cadastrado com Sucesso.",
+                status: 'success',
+                isClosable: true,
+                position: 'top-right',
+              });
+            setData('');
+            setHorario('');
         })
         .catch(error => {
             console.error('Erro ao cadastrar horário:', error);
-            alert('Erro ao cadastrar horário');
+            toast({
+                title: "Erro ao cadastrar horário",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+              });
+            setData('');
+            setHorario('');
         });
     };
 

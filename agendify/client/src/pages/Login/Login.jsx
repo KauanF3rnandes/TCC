@@ -7,15 +7,17 @@ import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { useToast } from '@chakra-ui/react';
 
 const Login = () => {
     const [show, setShow] = useState(false);
     const [email, setEmail] = useState('');
     const [senha, setSenha] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const handleClick = () => setShow(!show);
+    const toast = useToast()
+
 
     useEffect(() => {
         const loadData = async () => {
@@ -36,6 +38,12 @@ const Login = () => {
                 if (response.data.success) {
                     const token = response.data.token;
                     localStorage.setItem('token', token);
+                    toast({
+                        title: "Login feito com Sucesso",
+                        status: 'success',
+                        isClosable: true,
+                        position: 'top-right',
+                      });
     
                     const userRole = jwtDecode(token).role;
                     if (userRole === 'Admin') {
@@ -44,12 +52,26 @@ const Login = () => {
                         navigate('/main/cliente');
                     }
                 } else {
-                    setError('Usuário não encontrado ou senha incorreta. Tente novamente!');
+                    toast({
+                        title: "Usuário não encontrado ou senha incorreta. Tente novamente!",
+                        status: 'error',
+                        isClosable: true,
+                        position: 'top-right',
+                    });
+                    setEmail('');
+                    setSenha('');
                 }
             })
             .catch((error) => {
                 console.error("Erro ao fazer a solicitação:", error);
-                setError('Erro ao fazer login. Tente novamente mais tarde.');
+                toast({
+                    title: "Erro ao fazer login. Tente novamente mais tarde.",
+                    status: 'error',
+                    isClosable: true,
+                    position: 'top-right',
+                });    
+                setEmail('');
+                setSenha(''); 
             });
     };
     
@@ -61,11 +83,17 @@ const Login = () => {
 
     const validationLogin = () => {
         if (!email.trim() || !senha.trim()) {
-            setError('Por favor, preencha todos os campos.');
+            toast({
+                title: "Por favor, preencha todos os campos.",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+            });    
+            setEmail('');
+            setSenha(''); 
             return;
         }
     
-        setError('');
         handleClickLogin();
     };
 
@@ -126,7 +154,6 @@ const Login = () => {
                         </InputGroup>
                     </FormControl>
                         <Link onClick={() => RegisterPickHandler()} fontSize='12' mt='2'>Criar uma conta</Link>
-                        {error && <Text color="red">{error}</Text>}
                     <Button type="submit" onClick={validationLogin} colorScheme='blue' mt='6'>FAZER LOGIN</Button>                
                 </div>
             </div>

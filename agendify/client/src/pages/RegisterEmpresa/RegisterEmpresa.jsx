@@ -1,11 +1,8 @@
-import React, { useState } from "react";
-import { Button, FormControl, FormLabel, Input, InputGroup, InputRightElement, Text} from '@chakra-ui/react';
+import React, { useState, useEffect } from "react";
+import { Button, FormControl, FormLabel, Input, Center, Spinner} from '@chakra-ui/react';
 import './RegisterEmpresa.css';
-import logoRegister from '../../img/contratoLogo.avif';
-import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios, { Axios } from "axios";
-import { useToast } from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -20,7 +17,17 @@ const RegisterEmpresa = () => {
     const [error, setError] = useState('');
     const [msg, setMsg] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const toast = useToast()
+
+    useEffect(() => {
+        const loadData = async () => {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            setLoading(false);
+        };
+
+        loadData();
+    }, []);
 
     const handleClickRegisterEmpresa = () => {
         const userData = {
@@ -105,11 +112,26 @@ const RegisterEmpresa = () => {
         handleClickRegisterEmpresa();
     };
     
+    if (loading) {
+        return (
+            <Center h="100vh">
+                <Spinner
+                thickness='4px'
+                speed='0.65s'
+                emptyColor='gray.200'
+                color='blue.500'
+                size='xl'
+                mr={5}
+                />
+                <p>Carregando...</p>
+            </Center>
+        );
+    }
 
     return (
         <div className="container-register">
             <div className="box-register">
-                <h1 className="register-heading">Contratar Agendify</h1>
+                <h1 className="register-heading">Cadastrar Empresa</h1>
                 <div className="form-register">
                     <FormControl className="control-input">
                         <FormLabel>Empresa:</FormLabel>

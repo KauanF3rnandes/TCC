@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+
 .container-agendamentos {
     display: flex;
     justify-content: center;
@@ -7,8 +10,26 @@
     flex-direction: column;
 }
 
-.grid-container {
+.container-agendamentos .grid-container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+}
+
+.container-agendamentos .grid-container .card-agendamentos {
+    box-shadow: 1px 1px 5px 1px black;
+    margin-top: 20px;
+    margin-left: 20px;
+    height: auto;
+    width: auto;
+}
+
+.container-agendamentos .grid-container .card-agendamentos .card-text {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.container-agendamentos .pagination {
+    margin-top: 2rem;
 }

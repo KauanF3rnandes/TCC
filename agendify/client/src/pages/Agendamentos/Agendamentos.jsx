@@ -3,12 +3,12 @@ import Header from "../../components/Header";
 import SidebarClient from "../../components/Sidebar/SidebarClient";
 import axios from 'axios';
 import "./Agendamentos.css";
-import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button } from '@chakra-ui/react';
+import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button, Divider } from '@chakra-ui/react';
 
 const Agendamentos = () => {
     const [agendamentos, setAgendamentos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 8;
+    const itemsPerPage = 3;
 
     useEffect(() => {
         const fetchAgendamentos = async () => {
@@ -41,27 +41,33 @@ const Agendamentos = () => {
 
     return (
         <div>
-            <Header />
+            <div>
+                <Header className="testee"/>  
+            </div>
             <SidebarClient />
             <div className="container-agendamentos">
                 <div className="grid-container">
                     {currentItems.map(agendamento => (
-                        <Card key={agendamento.id}>
+                        <Card className="card-agendamentos" key={agendamento.id}>
                             <CardHeader>
                                 <Heading size='md'>{agendamento.DataAgendamento}</Heading>
                             </CardHeader>
+                            <Divider/>
                             <CardBody>
-                                <Text>Usuário: {agendamento.Usuario}</Text>
-                                <Text>Empresa: {agendamento.Empresa}</Text>
-                                <Text>Horário: {agendamento.Horario}</Text>
-                                <Text>Status: {agendamento.Status}</Text>
+                                <Text className="card-text">Usuário: {agendamento.Usuario}</Text>
+                                <Text className="card-text">Empresa: {agendamento.Empresa}</Text>
+                                <Text className="card-text">Horário: {agendamento.Horario}</Text>
+                                <Text className="card-text">Status: {agendamento.Status}</Text>
                             </CardBody>
+                            <CardFooter>
+                                <Button color={"white"} bg={"red"}>delete</Button>
+                            </CardFooter>
                         </Card>
                     ))}
                 </div>
                 <div className="pagination">
-                    <Button onClick={prevPage} disabled={currentPage === 1}>Anterior</Button>
-                    <Button onClick={nextPage} disabled={currentItems.length < itemsPerPage}>Próxima</Button>
+                    <Button color={"white"} bg="#333" mr={5} onClick={prevPage} disabled={currentPage === 1}>Anterior</Button>
+                    <Button color={"white"} bg="#333" onClick={nextPage} disabled={currentItems.length < itemsPerPage}>Próxima</Button>
                 </div>
             </div>
         </div>

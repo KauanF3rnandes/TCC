@@ -60,7 +60,7 @@ const Agendamentos = () => {
                                 <Text className="card-text">Status: {agendamento.Status}</Text>
                             </CardBody>
                             <CardFooter>
-                                <Button color={"white"} bg={"red"}>delete</Button>
+                                <Button color={"white"} bg={"red"}>Delete</Button>
                             </CardFooter>
                         </Card>
                     ))}

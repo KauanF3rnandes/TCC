@@ -17,13 +17,13 @@ const SidebarClient = () => {
       </div>
       <ul className="menu">
         <li>
-          <a href="/main">
+          <a href="/main/cliente">
             <FaHome />
             {!collapsed && <span>Home</span>}
           </a>
         </li>
         <li>
-          <a href="#">
+          <a href="/main/cliente/agendamentos">
             <RiCalendarScheduleFill />
             {!collapsed && <span>Agendamentos</span>}
           </a>

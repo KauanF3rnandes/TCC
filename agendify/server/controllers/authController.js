@@ -219,6 +219,54 @@ const getUser = async (req, res) => {
     }
 };
 
+const registrarAgendamento = (req, res) => {
+    const { usuarioId, empresaId, data, horario } = req.body;
+
+    console.log("Dados recebidos para agendamento:", { usuarioId, empresaId, data, horario });
+
+    if (!usuarioId || !empresaId || !data || !horario) {
+        console.error("Erro: Todos os campos são obrigatórios");
+        return res.status(400).send("Todos os campos são obrigatórios");
+    }
+
+    db.query("SELECT HorarioID FROM Horarios WHERE Horario = ?", [horario], (err, rows) => {
+        if (err) {
+            console.error("Erro ao buscar o ID do horário:", err);
+            return res.status(500).send("Erro ao buscar o ID do horário");
+        }
+        
+        if (rows.length === 0) {
+            console.error("Horário não encontrado no banco de dados");
+            return res.status(404).send("Horário não encontrado no banco de dados");
+        }
+
+        const horarioId = rows[0].HorarioID;
+
+        db.query("INSERT INTO Agendamentos (UsuarioID, EmpresaID, DataAgendamento, HorarioID) VALUES (?, ?, ?, ?)", 
+        [usuarioId, empresaId, data, horarioId], 
+        (err, response) => {
+            if (err) {
+                console.error("Erro ao registrar agendamento:", err);
+                return res.status(500).send("Erro ao registrar agendamento");
+            }
+            console.log("Agendamento registrado com sucesso");
+            res.send("Agendamento registrado com sucesso");
+        });
+    });
+};
+
+const listarAgendamentos = (req, res) => {
+    const usuarioId = req.userId;
+
+    db.query("SELECT a.DataAgendamento, u.nome AS Usuario, e.nome AS Empresa, h.Horario, a.Status FROM Agendamentos a JOIN usuarios u ON a.UsuarioID = u.UsuarioID JOIN empresas e ON a.EmpresaID = e.EmpresaID JOIN horarios h ON a.HorarioID = h.HorarioID WHERE a.UsuarioID = ?", [usuarioId], (err, result) => {
+        if (err) {
+            console.error("Erro ao buscar agendamentos:", err);
+            return res.status(500).send("Erro ao buscar agendamentos");
+        }
+        res.send(result);
+    });
+};
+
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
 };
@@ -227,4 +275,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos };

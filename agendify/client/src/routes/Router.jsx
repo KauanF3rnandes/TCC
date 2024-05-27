@@ -8,6 +8,7 @@ import RegisterEmpresa from "../pages/RegisterEmpresa/RegisterEmpresa";
 import PrivateRoute from './PrivateRoute';
 import Logout from '../pages/Logout/Logout';
 import MainAdmin from '../pages/MainAdmin/MainAdmin';
+import Agendamentos from '../pages/Agendamentos/Agendamentos';
 
 const AppRouter = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/main/cliente" element={<Main />} />
           <Route path="/main/admin" element={<MainAdmin />} />
+          <Route path="/main/cliente/agendamentos" element={<Agendamentos />} />
         </Route>
       </Routes>
     </Router>

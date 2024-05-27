@@ -1,12 +1,12 @@
-import { InputGroup, Input, InputRightElement, Button, Text, Link, Image, FormLabel, FormControl, Center, Spinner  } from "@chakra-ui/react";
+import { InputGroup, Input, InputRightElement, Button, Link, FormLabel, FormControl, Center, Spinner } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState, useEffect } from "react";
-import './Login.css'
-import loginImage from '../../img/login.jpg'
+import './Login.css';
+import loginImage from '../../img/login.jpg';
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import { useToast } from '@chakra-ui/react';
 
 const Login = () => {
@@ -16,8 +16,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const handleClick = () => setShow(!show);
-    const toast = useToast()
-
+    const toast = useToast();
 
     useEffect(() => {
         const loadData = async () => {
@@ -33,20 +32,25 @@ const Login = () => {
             email: email,
             senha: senha
         };
+
+        console.log('Enviando dados de login:', userData);
+
         axios.post("http://localhost:3001/auth/login", userData)
             .then((response) => {
                 if (response.data.success) {
                     const token = response.data.token;
                     const user = response.data.user;
                     localStorage.setItem('token', token);
-                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('userId', user.id);
+                    console.log('Dados do usuário salvos no localStorage:', { token, user });
+
                     toast({
                         title: "Login feito com Sucesso",
                         status: 'success',
                         isClosable: true,
                         position: 'top-right',
-                      });
-    
+                    });
+
                     const userRole = jwtDecode(token).role;
                     if (userRole === 'Admin') {
                         navigate('/main/admin');
@@ -71,13 +75,11 @@ const Login = () => {
                     status: 'error',
                     isClosable: true,
                     position: 'top-right',
-                });    
+                });
                 setEmail('');
-                setSenha(''); 
+                setSenha('');
             });
     };
-    
-    
 
     const RegisterPickHandler = () => {
         navigate('/register');
@@ -90,12 +92,12 @@ const Login = () => {
                 status: 'error',
                 isClosable: true,
                 position: 'top-right',
-            });    
+            });
             setEmail('');
-            setSenha(''); 
+            setSenha('');
             return;
         }
-    
+
         handleClickLogin();
     };
 
@@ -103,12 +105,12 @@ const Login = () => {
         return (
             <Center h="100vh">
                 <Spinner
-                thickness='4px'
-                speed='0.65s'
-                emptyColor='gray.200'
-                color='blue.500'
-                size='xl'
-                mr={5}
+                    thickness='4px'
+                    speed='0.65s'
+                    emptyColor='gray.200'
+                    color='blue.500'
+                    size='xl'
+                    mr={5}
                 />
                 <p>Carregando...</p>
             </Center>
@@ -134,7 +136,7 @@ const Login = () => {
                             border='1px'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            />
+                        />
                     </FormControl>
 
                     <FormControl>
@@ -147,16 +149,16 @@ const Login = () => {
                                 border='1px'
                                 value={senha}
                                 onChange={(e) => setSenha(e.target.value)}
-                                />
-                        <InputRightElement width='4.5rem'>
-                            <Button h='1.50rem' size='sm'  onClick={handleClick}>
-                                {show ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
-                            </Button>
-                        </InputRightElement>
+                            />
+                            <InputRightElement width='4.5rem'>
+                                <Button h='1.50rem' size='sm' onClick={handleClick}>
+                                    {show ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
+                                </Button>
+                            </InputRightElement>
                         </InputGroup>
                     </FormControl>
-                        <Link onClick={() => RegisterPickHandler()} fontSize='12' mt='2'>Criar uma conta</Link>
-                    <Button type="submit" onClick={validationLogin} colorScheme='blue' mt='6'>FAZER LOGIN</Button>                
+                    <Link onClick={() => RegisterPickHandler()} fontSize='12' mt='2'>Criar uma conta</Link>
+                    <Button type="submit" onClick={validationLogin} colorScheme='blue' mt='6'>FAZER LOGIN</Button>
                 </div>
             </div>
         </div>

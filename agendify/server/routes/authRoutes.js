@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, cadastro_empresa, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, verifyJWT } = require('../controllers/authController');
+const { register, login, cadastro_empresa, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, verifyJWT, registrarAgendamento, listarAgendamentos } = require('../controllers/authController');
 
 router.post('/register', register);
 router.post('/login', login);
@@ -9,6 +9,8 @@ router.get('/main/admin/empresas', listarEmpresas);
 router.post('/main/admin/cadastrar_horario', cadastrarHorario);
 router.get('/main/cliente/horarios_disponiveis', listarHorariosDisponiveis);
 router.get('/user', verifyJWT, getUser);
+router.post('/agendamento', verifyJWT, registrarAgendamento);
+router.get('/listarAgendamentos', verifyJWT ,listarAgendamentos)
 
 
 module.exports = router;

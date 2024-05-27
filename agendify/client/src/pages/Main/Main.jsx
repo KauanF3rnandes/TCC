@@ -6,6 +6,8 @@ import agenda from "../../img/AgendaLogo.jpg";
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, useDisclosure, Select } from '@chakra-ui/react';
 import Header from "../../components/Header";
 import axios from 'axios';
+import { useToast } from '@chakra-ui/react';
+
 
 const Main = () => {
     const [loading, setLoading] = useState(true);
@@ -15,6 +17,8 @@ const Main = () => {
     const [data, setData] = useState('');
     const [horarios, setHorarios] = useState([]);
     const [horarioSelecionado, setHorarioSelecionado] = useState('');
+    const toast = useToast();
+
 
     const initialRef = React.useRef(null);
     const finalRef = React.useRef(null);
@@ -27,8 +31,10 @@ const Main = () => {
 
         loadData();
 
+        console.log('Buscando empresas...');
         axios.get('http://localhost:3001/auth/main/admin/empresas')
         .then(response => {
+            console.log('Empresas recebidas:', response.data);
             setEmpresas(response.data);
         })
         .catch(error => {
@@ -38,8 +44,10 @@ const Main = () => {
 
     const fetchHorarios = (empresaId, data) => {
         if (empresaId && data) {
+            console.log(`Buscando horários para empresaId: ${empresaId}, data: ${data}`);
             axios.get(`http://localhost:3001/auth/main/cliente/horarios_disponiveis?empresaId=${empresaId}&data=${data}`)
                 .then(response => {
+                    console.log('Horários recebidos:', response.data);
                     setHorarios(response.data);
                 })
                 .catch(error => {
@@ -65,15 +73,60 @@ const Main = () => {
     };
 
     const handleAgendarClick = () => {
-        if (!empresaId || !data || !horarioSelecionado) {
-            alert("Por favor, selecione a empresa, a data e o horário");
-            return;
-        }
-
-
-        console.log("Agendamento realizado:", { empresaId, data, horarioSelecionado });
-        onClose();
+        const usuarioId = localStorage.getItem('userId');
+               
+        const agendamento = {
+            usuarioId,
+            empresaId,
+            data,
+            horario: horarioSelecionado
+        };
+    
+        console.log('Enviando agendamento:', agendamento);
+    
+        axios.post('http://localhost:3001/auth/agendamento', agendamento, {
+            headers: {
+                'x-access-token': localStorage.getItem('token')
+            }
+        })
+        .then(response => {
+            console.log('Resposta do servidor:', response.data);
+            toast({
+                title: "Agendamento feito com sucesso!",
+                status: 'success',
+                isClosable: true,
+                position: 'top-right',
+            });
+            onClose();
+    
+            setEmpresaId('');
+            setData('');
+            setHorarioSelecionado('');
+            setHorarios('');
+        })
+        .catch(error => {
+            console.error('Erro ao realizar agendamento:', error);
+            toast({
+                title: "Erro ao realizar agendamento",
+                status: 'error',
+                isClosable: true,
+                position: 'top-right',
+            });
+            setEmpresaId('');
+            setData('');
+            setHorarioSelecionado('');
+            setHorarios('');
+        });
     };
+
+    const handleClickClose = () => {
+        onClose();
+        setEmpresaId('');
+        setData('');
+        setHorarioSelecionado('');
+        setHorarios('');
+    }
+     
 
     if (loading) {
         return (
@@ -108,7 +161,7 @@ const Main = () => {
                     initialFocusRef={initialRef}
                     finalFocusRef={finalRef}
                     isOpen={isOpen}
-                    onClose={onClose}
+                    onClose={handleClickClose}
                 >
                     <ModalOverlay />
                     <ModalContent>
@@ -143,16 +196,21 @@ const Main = () => {
                                         ))
                                     ) : (
                                         <Text>Nenhum horário disponível</Text>
-                                    )}
+                                        )}
                                 </Box>
                             </FormControl>
                         </ModalBody>
 
                         <ModalFooter>
-                            <Button colorScheme='blue' mr={3} onClick={handleAgendarClick}>
-                                Agendar
-                            </Button>
-                            <Button onClick={onClose}>Cancelar</Button>
+                        <Button 
+                            colorScheme='blue' 
+                            mr={3} 
+                            onClick={handleAgendarClick}
+                            isDisabled={!empresaId || !data || !horarioSelecionado}
+                            >
+                            Agendar
+                        </Button>
+                            <Button onClick={handleClickClose}>Cancelar</Button>
                         </ModalFooter>
                     </ModalContent>
                 </Modal>

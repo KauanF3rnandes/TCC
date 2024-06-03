@@ -31,6 +31,17 @@
   box-shadow: 0 0 10px 1px #333;
 }
 
+.box-register {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60vw;
+  height: 90vh;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 1px #333;
+}
+
 .form-login {
   display: flex;
   flex-direction: column;
@@ -58,6 +69,12 @@
       flex-direction: column;
       width: 80vw;
       height: auto;
+  }
+
+  .box-register {
+    flex-direction: column;
+    width: 80vw;
+    height: auto;
   }
 
   .img-login {

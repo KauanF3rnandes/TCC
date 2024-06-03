@@ -115,7 +115,7 @@ const Register = () => {
 
     return (
         <div className="bgLogin">
-        <div className="box-login">
+        <div className="box-register">
             <div className="img-login">
                 <img src={loginImage} alt="imagem ilustrativa login" className="login-image" />
             </div>

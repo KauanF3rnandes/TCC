@@ -267,6 +267,49 @@ const listarAgendamentos = (req, res) => {
     });
 };
 
+const listarHorariosDaEmpresa = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const userResult = await new Promise((resolve, reject) => {
+            db.query("SELECT EmpresaID FROM usuarios WHERE UsuarioID = ?", [userId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        console.log("Resultado da consulta do usuário:", userResult);
+
+        if (userResult.length === 0) {
+            return res.status(404).send({ success: false, msg: "Usuário não encontrado" });
+        }
+
+        const empresaId = userResult[0].EmpresaID;
+
+        const horariosResult = await new Promise((resolve, reject) => {
+            db.query("SELECT * FROM Horarios WHERE EmpresaID = ?", [empresaId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        console.log("Horários encontrados:", horariosResult);
+
+        res.send(horariosResult);
+    } catch (err) {
+        console.error("Erro ao buscar horários da empresa:", err);
+        res.status(500).send({ success: false, error: "Erro ao buscar horários da empresa" });
+    }
+};
+
+
+
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
 };
@@ -275,4 +318,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa };

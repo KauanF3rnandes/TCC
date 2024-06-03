@@ -1,0 +1,27 @@
+.calendar-container {
+    max-width: 300px;
+    margin: 0 auto;
+    position: absolute;
+    top: 40%;
+    right: 0;
+    transform: translate(-50%, -50%);
+  }
+  
+  .react-calendar {
+    width: 100%;
+    font-size: 0.8em; 
+  }
+  
+  .react-calendar__tile {
+    padding: 0.5em; 
+  }
+  
+
+
+.container-horarios {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin-left: 16%; 
+}

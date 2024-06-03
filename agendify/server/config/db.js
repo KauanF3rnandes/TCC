@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const db = mysql.createPool({
     host: "localhost",
     user: "root",
-    password: "04022004",
+    password: "",
     database: "agendify",
 });
 

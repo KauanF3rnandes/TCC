@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaHome, FaUser, FaCog, FaSignOutAlt } from "react-icons/fa";
+import { FaHome, FaUser, FaCog, FaSignOutAlt, FaClock  } from "react-icons/fa";
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import { MdSpaceDashboard } from "react-icons/md";
 import "./style.css";
@@ -33,6 +33,12 @@ const SidebarAdmin = () => {
           <a href="#">
             <RiCalendarScheduleFill />
             {!collapsed && <span>Agendamentos</span>}
+          </a>
+        </li>
+        <li>
+          <a href="/main/admin/horarios">
+            <FaClock />
+            {!collapsed && <span>Horarios</span>}
           </a>
         </li>
         <li>

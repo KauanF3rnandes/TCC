@@ -6,7 +6,7 @@ const saltRounds = 10;
 const SECRET_KEY = 'f14tomcat';
 
 const register = (req, res) => {
-    const { email, nome, senha } = req.body; 
+    const { email, nome, senha, telefone, empresaId } = req.body; 
 
     db.query("SELECT * FROM usuarios WHERE email = ?", [email], (err, result) => {
         if (err) {
@@ -24,7 +24,7 @@ const register = (req, res) => {
                 return res.status(500).send("Erro ao registrar usuário");
             }
 
-            db.query("INSERT INTO usuarios (email, nome, senha) VALUES (?, ?, ?)", [email, nome, hash], 
+            db.query("INSERT INTO usuarios (email, nome, senha, telefone, empresaId) VALUES (?, ?, ?, ?, ?)", [email, nome, hash, telefone, empresaId], 
                 (err, response) => {
                     if (err) {
                         console.error("Erro ao registrar usuário:", err);

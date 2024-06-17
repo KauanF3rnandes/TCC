@@ -8,7 +8,7 @@ import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button, Divider 
 const Agendamentos = () => {
     const [agendamentos, setAgendamentos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 3;
+    const itemsPerPage = 4;
 
     useEffect(() => {
         const fetchAgendamentos = async () => {
@@ -27,30 +27,35 @@ const Agendamentos = () => {
         fetchAgendamentos();
     }, []);
 
+    const totalPages = Math.ceil(agendamentos.length / itemsPerPage);
+
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = agendamentos.slice(indexOfFirstItem, indexOfLastItem);
 
     const nextPage = () => {
-        setCurrentPage(currentPage + 1);
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
     };
 
     const prevPage = () => {
-        setCurrentPage(currentPage - 1);
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
     };
 
     return (
         <div>
-            <div>
-                <Header className="testee"/>  
-            </div>
+            <Header className="testee"/>  
             <SidebarClient />
             <div className="container-agendamentos">
+                <h1 className="title-agendamentos">SEUS AGENDAMENTOS:</h1>
                 <div className="grid-container">
                     {currentItems.map(agendamento => (
                         <Card className="card-agendamentos" key={agendamento.id}>
                             <CardHeader>
-                                <Heading size='md'>{agendamento.DataAgendamento}</Heading>
+                                <Heading size='md'>{new Date(agendamento.DataAgendamento).toLocaleDateString('pt-BR')}</Heading>
                             </CardHeader>
                             <Divider/>
                             <CardBody>
@@ -67,7 +72,7 @@ const Agendamentos = () => {
                 </div>
                 <div className="pagination">
                     <Button color={"white"} bg="#333" mr={5} onClick={prevPage} disabled={currentPage === 1}>Anterior</Button>
-                    <Button color={"white"} bg="#333" onClick={nextPage} disabled={currentItems.length < itemsPerPage}>Próxima</Button>
+                    <Button color={"white"} bg="#333" onClick={nextPage} disabled={currentPage === totalPages || currentItems.length < itemsPerPage}>Próxima</Button>
                 </div>
             </div>
         </div>

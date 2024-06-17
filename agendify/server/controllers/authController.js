@@ -187,6 +187,19 @@ const listarHorariosDisponiveis = (req, res) => {
     });
 };
 
+const deletarHorario = (req, res) => {
+    const horarioId = req.params.horarioId;
+
+    db.query("DELETE FROM Horarios WHERE HorarioID = ?", [horarioId], (err, result) => {
+        if (err) {
+            console.error("Erro ao deletar horário:", err);
+            return res.status(500).send("Erro ao deletar horário");
+        }
+        console.log("Horário deletado com sucesso");
+        res.send("Horário deletado com sucesso");
+    });
+};
+
 const getUser = async (req, res) => {
     try {
         const userId = req.userId;
@@ -267,6 +280,20 @@ const listarAgendamentos = (req, res) => {
     });
 };
 
+const deletarAgendamento = (req, res) => {
+    const agendamentoId = req.params.agendamentoId;
+
+    db.query("DELETE FROM Agendamentos WHERE AgendamentoID = ?", [agendamentoId], (err, result) => {
+        if (err) {
+            console.error("Erro ao deletar agendamento:", err);
+            return res.status(500).send("Erro ao deletar agendamento");
+        }
+        console.log("Agendamento deletado com sucesso");
+        res.send("Agendamento deletado com sucesso");
+    });
+};
+
+
 const listarHorariosDaEmpresa = async (req, res) => {
     const userId = req.userId;
 
@@ -318,4 +345,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento };

@@ -53,7 +53,7 @@ const Horarios = () => {
                 <div className='container-horarios'>
                     <h1 className='title-horarios'>Horários Cadastrados</h1>
                     <Table border='1px' variant="simple">
-                    <TableCaption>Horários cadastrados pela empresa do usuário</TableCaption>
+                    <TableCaption>Horários cadastrados</TableCaption>
                         <Thead>
                             <Tr border='1px' bgColor='#333'>
                                 <Th border='1px' color='white'>ID do Horário</Th>

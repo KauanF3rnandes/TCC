@@ -24,13 +24,7 @@ const SidebarAdmin = () => {
           </a>
         </li>
         <li>
-          <a href="#">
-            <MdSpaceDashboard />
-            {!collapsed && <span>dashboard</span>}
-          </a>
-        </li>
-        <li>
-          <a href="#">
+          <a href="/main/admin/agendamentos_empresa">
             <RiCalendarScheduleFill />
             {!collapsed && <span>Agendamentos</span>}
           </a>

@@ -8,7 +8,6 @@ import Header from "../../components/Header";
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react';
 
-
 const Main = () => {
     const [loading, setLoading] = useState(true);
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -18,7 +17,6 @@ const Main = () => {
     const [horarios, setHorarios] = useState([]);
     const [horarioSelecionado, setHorarioSelecionado] = useState('');
     const toast = useToast();
-
 
     const initialRef = React.useRef(null);
     const finalRef = React.useRef(null);
@@ -31,10 +29,8 @@ const Main = () => {
 
         loadData();
 
-        console.log('Buscando empresas...');
         axios.get('http://localhost:3001/auth/main/admin/empresas')
         .then(response => {
-            console.log('Empresas recebidas:', response.data);
             setEmpresas(response.data);
         })
         .catch(error => {
@@ -44,10 +40,8 @@ const Main = () => {
 
     const fetchHorarios = (empresaId, data) => {
         if (empresaId && data) {
-            console.log(`Buscando horários para empresaId: ${empresaId}, data: ${data}`);
             axios.get(`http://localhost:3001/auth/main/cliente/horarios_disponiveis?empresaId=${empresaId}&data=${data}`)
                 .then(response => {
-                    console.log('Horários recebidos:', response.data);
                     setHorarios(response.data);
                 })
                 .catch(error => {
@@ -82,15 +76,12 @@ const Main = () => {
             horario: horarioSelecionado
         };
     
-        console.log('Enviando agendamento:', agendamento);
-    
         axios.post('http://localhost:3001/auth/agendamento', agendamento, {
             headers: {
                 'x-access-token': localStorage.getItem('token')
             }
         })
         .then(response => {
-            console.log('Resposta do servidor:', response.data);
             toast({
                 title: "Agendamento feito com sucesso!",
                 status: 'success',
@@ -102,7 +93,7 @@ const Main = () => {
             setEmpresaId('');
             setData('');
             setHorarioSelecionado('');
-            setHorarios('');
+            setHorarios([]);
         })
         .catch(error => {
             console.error('Erro ao realizar agendamento:', error);
@@ -115,7 +106,7 @@ const Main = () => {
             setEmpresaId('');
             setData('');
             setHorarioSelecionado('');
-            setHorarios('');
+            setHorarios([]);
         });
     };
 
@@ -124,9 +115,16 @@ const Main = () => {
         setEmpresaId('');
         setData('');
         setHorarioSelecionado('');
-        setHorarios('');
-    }
-     
+        setHorarios([]);
+    };
+
+    const getCurrentDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
 
     if (loading) {
         return (
@@ -145,13 +143,9 @@ const Main = () => {
     }
 
     return (
-        <body className="bgColorMain">
-            <div>
-                <Header />
-            </div>
-            <div>
-                <Sidebar />
-            </div>
+        <div className="bgColorMain">
+            <Header />
+            <Sidebar />
             <div className="container-main">
                 <div className="content">
                     <img src={agenda} alt="logo de calendario" />
@@ -170,11 +164,23 @@ const Main = () => {
                         <ModalBody pb={4}>
                             <FormControl mt={4}>
                                 <FormLabel>Data:</FormLabel>
-                                <Input border='1px' type="date" placeholder='data' value={data} onChange={handleDataChange} />
+                                <Input 
+                                    border='1px' 
+                                    type="date" 
+                                    placeholder='data' 
+                                    value={data} 
+                                    onChange={handleDataChange} 
+                                    min={getCurrentDate()} 
+                                />
                             </FormControl>
                             <FormControl>
                                 <FormLabel mt={4}>Empresa</FormLabel>
-                                <Select border='1px' placeholder="Selecione uma empresa" value={empresaId} onChange={handleEmpresaChange}>
+                                <Select 
+                                    border='1px' 
+                                    placeholder="Selecione uma empresa" 
+                                    value={empresaId} 
+                                    onChange={handleEmpresaChange}
+                                >
                                     {empresas.map(empresa => (
                                         <option key={empresa.EmpresaID} value={empresa.EmpresaID}>{empresa.Nome}</option>
                                     ))}
@@ -196,26 +202,25 @@ const Main = () => {
                                         ))
                                     ) : (
                                         <Text>Nenhum horário disponível</Text>
-                                        )}
+                                    )}
                                 </Box>
                             </FormControl>
                         </ModalBody>
-
                         <ModalFooter>
-                        <Button 
-                            colorScheme='blue' 
-                            mr={3} 
-                            onClick={handleAgendarClick}
-                            isDisabled={!empresaId || !data || !horarioSelecionado}
+                            <Button 
+                                colorScheme='blue' 
+                                mr={3} 
+                                onClick={handleAgendarClick}
+                                isDisabled={!empresaId || !data || !horarioSelecionado}
                             >
-                            Agendar
-                        </Button>
+                                Agendar
+                            </Button>
                             <Button onClick={handleClickClose}>Cancelar</Button>
                         </ModalFooter>
                     </ModalContent>
                 </Modal>
             </div>
-        </body>
+        </div>
     );
 }
 

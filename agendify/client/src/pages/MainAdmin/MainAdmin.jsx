@@ -13,8 +13,7 @@ const MainAdmin = () => {
     const [data, setData] = useState('');
     const [horario, setHorario] = useState('');
     const [empresaId, setEmpresaId] = useState('');
-    const toast = useToast()
-
+    const toast = useToast();
 
     useEffect(() => {
         const loadData = async () => {
@@ -40,13 +39,12 @@ const MainAdmin = () => {
             horario
         })
         .then(response => {
-            console.log(response.data);
             toast({
                 title: "Horário cadastrado com Sucesso.",
                 status: 'success',
                 isClosable: true,
                 position: 'top-right',
-              });
+            });
             setData('');
             setHorario('');
         })
@@ -57,10 +55,18 @@ const MainAdmin = () => {
                 status: 'error',
                 isClosable: true,
                 position: 'top-right',
-              });
+            });
             setData('');
             setHorario('');
         });
+    };
+
+    const getCurrentDate = () => {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const day = today.getDate().toString().padStart(2, '0');
+        return `${year}-${month}-${day}`;
     };
 
     if (loading) {
@@ -91,7 +97,13 @@ const MainAdmin = () => {
                 <FormControl className="form-format">
                     <h2>Cadastrar Horário</h2>
                     <FormLabel mt={5}>Data</FormLabel>
-                    <Input border='1px' type='date' value={data} onChange={(e) => setData(e.target.value)} />
+                    <Input 
+                        border='1px' 
+                        type='date' 
+                        value={data} 
+                        onChange={(e) => setData(e.target.value)} 
+                        min={getCurrentDate()} 
+                    />
 
                     <FormLabel mt={5}>Horário</FormLabel>
                     <Input border='1px' type='time' value={horario} onChange={(e) => setHorario(e.target.value)} />

@@ -370,6 +370,33 @@ const cadastrarServico = (req, res) => {
     );
 };
 
+const listarServicosDaEmpresa = (req, res) => {
+    const usuarioId = req.userId;
+
+    db.query("SELECT EmpresaID FROM Usuarios WHERE UsuarioID = ?", [usuarioId], (err, rows) => {
+        if (err) {
+            console.error("Erro ao buscar empresa do usuário:", err);
+            return res.status(500).send("Erro ao buscar empresa do usuário");
+        }
+
+        if (rows.length === 0) {
+            console.error("Usuário não encontrado ou não possui empresa");
+            return res.status(404).send("Usuário não encontrado ou não possui empresa");
+        }
+
+        const empresaId = rows[0].EmpresaID;
+
+        db.query("SELECT * FROM Servicos WHERE EmpresaID = ?", [empresaId], (err, rows) => {
+            if (err) {
+                console.error("Erro ao buscar serviços da empresa:", err);
+                return res.status(500).send("Erro ao buscar serviços da empresa");
+            }
+
+            res.json(rows);
+        });
+    });
+};
+
 
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
@@ -379,4 +406,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa };

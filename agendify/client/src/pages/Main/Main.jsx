@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar/SidebarClient";
-import { Center, Spinner, Box, Text, Button } from '@chakra-ui/react';
+import { Center, Spinner, Box, Text, Button, FormControl, FormLabel, Input, Select, useDisclosure, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from '@chakra-ui/react';
 import './Main.css';
 import agenda from "../../img/AgendaLogo.jpg";
-import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, FormControl, FormLabel, useDisclosure, Select } from '@chakra-ui/react';
 import Header from "../../components/Header";
 import axios from 'axios';
-import { useToast } from '@chakra-ui/react';
 
 const Main = () => {
     const [loading, setLoading] = useState(true);
@@ -16,6 +14,8 @@ const Main = () => {
     const [data, setData] = useState('');
     const [horarios, setHorarios] = useState([]);
     const [horarioSelecionado, setHorarioSelecionado] = useState('');
+    const [servicos, setServicos] = useState([]);
+    const [servicoSelecionado, setServicoSelecionado] = useState('');
     const toast = useToast();
 
     const initialRef = React.useRef(null);
@@ -56,6 +56,22 @@ const Main = () => {
         }
     };
 
+    const fetchServicos = (empresaId) => {
+        if (empresaId) {
+            axios.get(`http://localhost:3001/auth/servicos?empresaId=${empresaId}`, {
+                headers: {
+                    'x-access-token': localStorage.getItem('token')
+                }
+            })
+            .then(response => {
+                setServicos(response.data);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar serviços:', error);
+            });
+        }
+    };
+
     const handleDataChange = (e) => {
         const selectedData = e.target.value;
         setData(selectedData);
@@ -66,6 +82,11 @@ const Main = () => {
         const selectedEmpresaId = e.target.value;
         setEmpresaId(selectedEmpresaId);
         fetchHorarios(selectedEmpresaId, data);
+        fetchServicos(selectedEmpresaId);
+    };
+
+    const handleServicoChange = (e) => {
+        setServicoSelecionado(e.target.value);
     };
 
     const handleHorarioClick = (horario) => {
@@ -78,6 +99,7 @@ const Main = () => {
         const agendamento = {
             usuarioId,
             empresaId,
+            servicoId: servicoSelecionado,
             data,
             horario: horarioSelecionado
         };
@@ -98,6 +120,7 @@ const Main = () => {
 
                 setEmpresaId('');
                 setData('');
+                setServicoSelecionado('');
                 setHorarioSelecionado('');
                 setHorarios([]);
             })
@@ -111,6 +134,7 @@ const Main = () => {
                 });
                 setEmpresaId('');
                 setData('');
+                setServicoSelecionado('');
                 setHorarioSelecionado('');
                 setHorarios([]);
             });
@@ -120,6 +144,7 @@ const Main = () => {
         onClose();
         setEmpresaId('');
         setData('');
+        setServicoSelecionado('');
         setHorarioSelecionado('');
         setHorarios([]);
     };
@@ -190,6 +215,19 @@ const Main = () => {
                                     <option key={empresa.EmpresaID} value={empresa.EmpresaID}>{empresa.Nome}</option>
                                 </Select>
                             </FormControl>
+                            <FormControl>
+                                <FormLabel mt={4}>Serviço</FormLabel>
+                                <Select
+                                    border='1px'
+                                    placeholder="Selecione um serviço"
+                                    value={servicoSelecionado}
+                                    onChange={handleServicoChange}
+                                >
+                                    {servicos.map(servico => (
+                                        <option key={servico.ServicoID} value={servico.ServicoID}>{servico.Nome}</option>
+                                    ))}
+                                </Select>
+                            </FormControl>
                             <FormControl mt={4}>
                                 <FormLabel>Horários Disponíveis:</FormLabel>
                                 <Box>
@@ -215,7 +253,7 @@ const Main = () => {
                                 colorScheme='blue'
                                 mr={3}
                                 onClick={handleAgendarClick}
-                                isDisabled={!empresaId || !data || !horarioSelecionado}
+                                isDisabled={!empresaId || !data || !horarioSelecionado || !servicoSelecionado}
                             >
                                 Agendar
                             </Button>

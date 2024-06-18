@@ -1,7 +1,0 @@
-# .gitignore
-node_modules/
-**/node_modules/
-*.log
-dist/
-build/
-.env

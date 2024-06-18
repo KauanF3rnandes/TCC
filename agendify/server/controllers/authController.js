@@ -350,6 +350,26 @@ const listarEmpresaUsuarioLogado = (req, res) => {
     });
 };
 
+const cadastrarServico = (req, res) => {
+    const { titulo, descricao, duracao, valor, empresaId } = req.body;
+
+    if (!titulo || !descricao || !duracao || !valor || !empresaId) {
+        return res.status(400).send("Todos os campos são obrigatórios");
+    }
+
+    db.query("INSERT INTO Servicos (Nome, Descricao, Duracao, Preco, EmpresaID) VALUES (?, ?, ?, ?, ?)", 
+        [titulo, descricao, duracao, valor, empresaId], 
+        (err, response) => {
+            if (err) {
+                console.error("Erro ao cadastrar serviço:", err);
+                return res.status(500).send("Erro ao cadastrar serviço");
+            }
+            console.log("Serviço cadastrado com sucesso");
+            res.send("Serviço cadastrado com sucesso");
+        }
+    );
+};
+
 
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
@@ -359,4 +379,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico };

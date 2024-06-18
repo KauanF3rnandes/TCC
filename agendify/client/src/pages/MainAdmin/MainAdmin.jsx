@@ -29,7 +29,7 @@ const MainAdmin = () => {
             }
         })
         .then(response => {
-            setEmpresas([response.data]); // Armazena a empresa do usuário logado em um array para manter compatibilidade com o mapeamento na renderização
+            setEmpresas([response.data]); 
         })
         .catch(error => {
             console.error('Erro ao buscar empresa do usuário:', error);

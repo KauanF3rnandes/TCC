@@ -1,4 +1,4 @@
-div .form-ctnr {
+div .form-service {
     height: 100vh;
     width: 100vw;
     position: fixed;
@@ -6,27 +6,28 @@ div .form-ctnr {
     justify-content: center;
     align-items: center;
     margin-left: 8%; 
+    bottom: 13%;
 }
 
-div .form-ctnr .form-format {
+div .form-service .form-format {
     width: 40%;
     height: 40%;
 }
 
-div .form-ctnr .form-format h2 {
+div .form-service .form-format h2 {
     font-size: 30px;
     font-weight: bold;
 }
 
 
 @media screen and (max-width: 768px) {
-    div .form-ctnr .form-format {
+    div .form-service .form-format {
         width: 50%;
         height: 50%;
     }
 
-    div .form-ctnr .form-format h2 {
-        font-size: 25px;
+    div .form-service .form-format h2 {
+        font-size: 20px;
         font-weight: bold;
     }
 

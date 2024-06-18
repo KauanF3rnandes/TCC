@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaHome, FaUser, FaCog, FaSignOutAlt, FaClock  } from "react-icons/fa";
 import { RiCalendarScheduleFill } from "react-icons/ri";
-import { MdSpaceDashboard } from "react-icons/md";
+import { MdAddCircle } from "react-icons/md";
 import "./style.css";
 
 const SidebarAdmin = () => {
@@ -21,6 +21,12 @@ const SidebarAdmin = () => {
           <a href="/main/admin">
             <FaHome />
             {!collapsed && <span>Home</span>}
+          </a>
+        </li>
+        <li>
+          <a href="/main/admin/cadastrar_servico">
+            <MdAddCircle />
+            {!collapsed && <span>Cadastrar Serviço</span>}
           </a>
         </li>
         <li>

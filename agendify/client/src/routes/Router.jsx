@@ -11,6 +11,7 @@ import MainAdmin from '../pages/MainAdmin/MainAdmin';
 import Agendamentos from '../pages/Agendamentos/Agendamentos';
 import Horarios from '../pages/Horarios/Horarios';
 import AgendamentosAdmin from '../pages/AgendamentosAdmin/AgendamentosAdmin';
+import Servico from '../pages/Servico/Servico';
 
 const AppRouter = () => {
   return (
@@ -27,6 +28,7 @@ const AppRouter = () => {
           <Route path="/main/cliente/agendamentos" element={<Agendamentos />} />
           <Route path="/main/admin/horarios" element={<Horarios />} />
           <Route path="/main/admin/agendamentos_empresa" element={<AgendamentosAdmin />} />
+          <Route path="/main/admin/cadastrar_servico" element={<Servico />} />
         </Route>
       </Routes>
     </Router>

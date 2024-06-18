@@ -23,13 +23,17 @@ const MainAdmin = () => {
 
         loadData();
 
-        axios.get('http://localhost:3001/auth/main/admin/empresas')
-            .then(response => {
-                setEmpresas(response.data);
-            })
-            .catch(error => {
-                console.error('Erro ao buscar empresas:', error);
-            });
+        axios.get('http://localhost:3001/auth/minha-empresa', {
+            headers: {
+                'x-access-token': localStorage.getItem('token')
+            }
+        })
+        .then(response => {
+            setEmpresas([response.data]); // Armazena a empresa do usuário logado em um array para manter compatibilidade com o mapeamento na renderização
+        })
+        .catch(error => {
+            console.error('Erro ao buscar empresa do usuário:', error);
+        });
     }, []);
 
     const handleCadastroHorario = () => {

@@ -335,6 +335,20 @@ const listarHorariosDaEmpresa = async (req, res) => {
     }
 };
 
+const listarEmpresaUsuarioLogado = (req, res) => {
+    const userId = req.userId;
+
+    db.query("SELECT e.* FROM empresas e JOIN usuarios u ON e.EmpresaID = u.EmpresaID WHERE u.UsuarioID = ?", [userId], (err, result) => {
+        if (err) {
+            console.error("Erro ao buscar empresa do usuário:", err);
+            return res.status(500).send("Erro ao buscar empresa do usuário");
+        }
+        if (result.length === 0) {
+            return res.status(404).send({ success: false, msg: "Empresa não encontrada para este usuário" });
+        }
+        res.send(result[0]); 
+    });
+};
 
 
 const adminRoute = (req, res) => {
@@ -345,4 +359,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento };
+module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado };

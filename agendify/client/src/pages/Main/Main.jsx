@@ -11,7 +11,7 @@ import { useToast } from '@chakra-ui/react';
 const Main = () => {
     const [loading, setLoading] = useState(true);
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [empresas, setEmpresas] = useState([]);
+    const [empresa, setEmpresa] = useState(null);
     const [empresaId, setEmpresaId] = useState('');
     const [data, setData] = useState('');
     const [horarios, setHorarios] = useState([]);
@@ -22,20 +22,26 @@ const Main = () => {
     const finalRef = React.useRef(null);
 
     useEffect(() => {
+        const fetchEmpresa = async () => {
+            try {
+                const response = await axios.get('http://localhost:3001/auth/minha-empresa', {
+                    headers: {
+                        'x-access-token': localStorage.getItem('token')
+                    }
+                });
+                setEmpresa(response.data);
+            } catch (error) {
+                console.error('Erro ao buscar empresa do usuário:', error);
+            }
+        };
+
         const loadData = async () => {
             await new Promise(resolve => setTimeout(resolve, 1000));
             setLoading(false);
         };
 
+        fetchEmpresa();
         loadData();
-
-        axios.get('http://localhost:3001/auth/main/admin/empresas')
-        .then(response => {
-            setEmpresas(response.data);
-        })
-        .catch(error => {
-            console.error('Erro ao buscar empresas:', error);
-        });
     }, []);
 
     const fetchHorarios = (empresaId, data) => {
@@ -68,46 +74,46 @@ const Main = () => {
 
     const handleAgendarClick = () => {
         const usuarioId = localStorage.getItem('userId');
-               
+
         const agendamento = {
             usuarioId,
             empresaId,
             data,
             horario: horarioSelecionado
         };
-    
+
         axios.post('http://localhost:3001/auth/agendamento', agendamento, {
             headers: {
                 'x-access-token': localStorage.getItem('token')
             }
         })
-        .then(response => {
-            toast({
-                title: "Agendamento feito com sucesso!",
-                status: 'success',
-                isClosable: true,
-                position: 'top-right',
+            .then(response => {
+                toast({
+                    title: "Agendamento feito com sucesso!",
+                    status: 'success',
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                onClose();
+
+                setEmpresaId('');
+                setData('');
+                setHorarioSelecionado('');
+                setHorarios([]);
+            })
+            .catch(error => {
+                console.error('Erro ao realizar agendamento:', error);
+                toast({
+                    title: "Erro ao realizar agendamento",
+                    status: 'error',
+                    isClosable: true,
+                    position: 'top-right',
+                });
+                setEmpresaId('');
+                setData('');
+                setHorarioSelecionado('');
+                setHorarios([]);
             });
-            onClose();
-    
-            setEmpresaId('');
-            setData('');
-            setHorarioSelecionado('');
-            setHorarios([]);
-        })
-        .catch(error => {
-            console.error('Erro ao realizar agendamento:', error);
-            toast({
-                title: "Erro ao realizar agendamento",
-                status: 'error',
-                isClosable: true,
-                position: 'top-right',
-            });
-            setEmpresaId('');
-            setData('');
-            setHorarioSelecionado('');
-            setHorarios([]);
-        });
     };
 
     const handleClickClose = () => {
@@ -164,26 +170,24 @@ const Main = () => {
                         <ModalBody pb={4}>
                             <FormControl mt={4}>
                                 <FormLabel>Data:</FormLabel>
-                                <Input 
-                                    border='1px' 
-                                    type="date" 
-                                    placeholder='data' 
-                                    value={data} 
-                                    onChange={handleDataChange} 
-                                    min={getCurrentDate()} 
+                                <Input
+                                    border='1px'
+                                    type="date"
+                                    placeholder='data'
+                                    value={data}
+                                    onChange={handleDataChange}
+                                    min={getCurrentDate()}
                                 />
                             </FormControl>
                             <FormControl>
                                 <FormLabel mt={4}>Empresa</FormLabel>
-                                <Select 
-                                    border='1px' 
-                                    placeholder="Selecione uma empresa" 
-                                    value={empresaId} 
+                                <Select
+                                    border='1px'
+                                    placeholder="Selecione uma empresa"
+                                    value={empresaId}
                                     onChange={handleEmpresaChange}
                                 >
-                                    {empresas.map(empresa => (
-                                        <option key={empresa.EmpresaID} value={empresa.EmpresaID}>{empresa.Nome}</option>
-                                    ))}
+                                    <option key={empresa.EmpresaID} value={empresa.EmpresaID}>{empresa.Nome}</option>
                                 </Select>
                             </FormControl>
                             <FormControl mt={4}>
@@ -207,9 +211,9 @@ const Main = () => {
                             </FormControl>
                         </ModalBody>
                         <ModalFooter>
-                            <Button 
-                                colorScheme='blue' 
-                                mr={3} 
+                            <Button
+                                colorScheme='blue'
+                                mr={3}
                                 onClick={handleAgendarClick}
                                 isDisabled={!empresaId || !data || !horarioSelecionado}
                             >

@@ -233,11 +233,11 @@ const getUser = async (req, res) => {
 };
 
 const registrarAgendamento = (req, res) => {
-    const { usuarioId, empresaId, data, horario } = req.body;
+    const { usuarioId, empresaId, data, horario, servicoId } = req.body;
 
-    console.log("Dados recebidos para agendamento:", { usuarioId, empresaId, data, horario });
+    console.log("Dados recebidos para agendamento:", { usuarioId, empresaId, data, horario, servicoId });
 
-    if (!usuarioId || !empresaId || !data || !horario) {
+    if (!usuarioId || !empresaId || !data || !horario || !servicoId) {
         console.error("Erro: Todos os campos são obrigatórios");
         return res.status(400).send("Todos os campos são obrigatórios");
     }
@@ -255,8 +255,8 @@ const registrarAgendamento = (req, res) => {
 
         const horarioId = rows[0].HorarioID;
 
-        db.query("INSERT INTO Agendamentos (UsuarioID, EmpresaID, DataAgendamento, HorarioID) VALUES (?, ?, ?, ?)", 
-        [usuarioId, empresaId, data, horarioId], 
+        db.query("INSERT INTO Agendamentos (UsuarioID, EmpresaID, DataAgendamento, HorarioID, ServicoID) VALUES (?, ?, ?, ?, ?)", 
+        [usuarioId, empresaId, data, horarioId, servicoId], 
         (err, response) => {
             if (err) {
                 console.error("Erro ao registrar agendamento:", err);
@@ -267,6 +267,7 @@ const registrarAgendamento = (req, res) => {
         });
     });
 };
+
 
 const listarAgendamentos = (req, res) => {
     const usuarioId = req.userId;
@@ -282,6 +283,7 @@ const listarAgendamentos = (req, res) => {
 
 const deletarAgendamento = (req, res) => {
     const agendamentoId = req.params.agendamentoId;
+    console.log("ID do agendamento recebido no backend:", agendamentoId);
 
     db.query("DELETE FROM Agendamentos WHERE AgendamentoID = ?", [agendamentoId], (err, result) => {
         if (err) {

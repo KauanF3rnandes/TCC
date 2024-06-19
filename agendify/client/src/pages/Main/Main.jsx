@@ -95,7 +95,7 @@ const Main = () => {
 
     const handleAgendarClick = () => {
         const usuarioId = localStorage.getItem('userId');
-
+    
         const agendamento = {
             usuarioId,
             empresaId,
@@ -103,7 +103,7 @@ const Main = () => {
             data,
             horario: horarioSelecionado
         };
-
+    
         axios.post('http://localhost:3001/auth/agendamento', agendamento, {
             headers: {
                 'x-access-token': localStorage.getItem('token')
@@ -117,7 +117,7 @@ const Main = () => {
                     position: 'top-right',
                 });
                 onClose();
-
+    
                 setEmpresaId('');
                 setData('');
                 setServicoSelecionado('');
@@ -139,6 +139,7 @@ const Main = () => {
                 setHorarios([]);
             });
     };
+    
 
     const handleClickClose = () => {
         onClose();

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar/SidebarClient";
-import { Center, Spinner, Box, Text, Button, FormControl, FormLabel, Input, Select, useDisclosure, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from '@chakra-ui/react';
+import { Center, Spinner, Box, Text, Button, FormControl, FormLabel, Input, Select, useDisclosure, useToast, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Tooltip } from '@chakra-ui/react';
 import './Main.css';
 import agenda from "../../img/AgendaLogo.jpg";
 import Header from "../../components/Header";
@@ -85,8 +85,8 @@ const Main = () => {
         fetchServicos(selectedEmpresaId);
     };
 
-    const handleServicoChange = (e) => {
-        setServicoSelecionado(e.target.value);
+    const handleServicoClick = (servicoId) => {
+        setServicoSelecionado(servicoId);
     };
 
     const handleHorarioClick = (horario) => {
@@ -218,16 +218,28 @@ const Main = () => {
                             </FormControl>
                             <FormControl>
                                 <FormLabel mt={4}>Serviço</FormLabel>
-                                <Select
-                                    border='1px'
-                                    placeholder="Selecione um serviço"
-                                    value={servicoSelecionado}
-                                    onChange={handleServicoChange}
-                                >
-                                    {servicos.map(servico => (
-                                        <option key={servico.ServicoID} value={servico.ServicoID}>{servico.Nome}</option>
-                                    ))}
-                                </Select>
+                                <Box>
+                                    {servicos.length > 0 ? (
+                                        servicos.map(servico => (
+                                            <Tooltip 
+                                                key={servico.ServicoID}
+                                                label={`Descrição: ${servico.Descricao}\nDuração: ${servico.Duracao} minutos\nPreço: R$${servico.Preco}`}
+                                                aria-label="A tooltip"
+                                                whiteSpace="pre-line"
+                                            >
+                                                <Button
+                                                    onClick={() => handleServicoClick(servico.ServicoID)}
+                                                    m={1}
+                                                    colorScheme={servicoSelecionado === servico.ServicoID ? 'blue' : 'gray'}
+                                                >
+                                                    {servico.Nome}
+                                                </Button>
+                                            </Tooltip>
+                                        ))
+                                    ) : (
+                                        <Text>Nenhum serviço disponível</Text>
+                                    )}
+                                </Box>
                             </FormControl>
                             <FormControl mt={4}>
                                 <FormLabel>Horários Disponíveis:</FormLabel>

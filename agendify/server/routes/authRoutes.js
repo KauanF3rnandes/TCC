@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, cadastro_empresa, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, verifyJWT, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa } = require('../controllers/authController');
+const { register, login, cadastro_empresa, atualizarStatusAgendamento, listarAgendamentosEmpresa, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, verifyJWT, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa } = require('../controllers/authController');
 
 router.post('/register', register);
 router.post('/login', login);
@@ -17,6 +17,8 @@ router.delete('/main/cliente/deletar_agendamento/:agendamentoId', verifyJWT, del
 router.get('/minha-empresa', verifyJWT, listarEmpresaUsuarioLogado);
 router.post('/cadastrar_servico', cadastrarServico);
 router.get('/servicos', verifyJWT, listarServicosDaEmpresa); 
+router.get('/main/admin/agendamentos', verifyJWT, listarAgendamentosEmpresa);
+router.put('/main/admin/agendamentos/confirmar/:id', verifyJWT, atualizarStatusAgendamento);
 
 
 module.exports = router;

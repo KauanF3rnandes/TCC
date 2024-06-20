@@ -268,7 +268,6 @@ const registrarAgendamento = (req, res) => {
     });
 };
 
-
 const listarAgendamentos = (req, res) => {
     const usuarioId = req.userId;
 
@@ -283,7 +282,6 @@ const listarAgendamentos = (req, res) => {
 
 const deletarAgendamento = (req, res) => {
     const agendamentoId = req.params.agendamentoId;
-    console.log("ID do agendamento recebido no backend:", agendamentoId);
 
     db.query("DELETE FROM Agendamentos WHERE AgendamentoID = ?", [agendamentoId], (err, result) => {
         if (err) {
@@ -399,6 +397,74 @@ const listarServicosDaEmpresa = (req, res) => {
     });
 };
 
+const listarAgendamentosEmpresa = async (req, res) => {
+    const userId = req.userId;
+
+    try {
+        const userResult = await new Promise((resolve, reject) => {
+            db.query("SELECT EmpresaID FROM usuarios WHERE UsuarioID = ?", [userId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        if (userResult.length === 0) {
+            return res.status(404).send({ success: false, msg: "Usuário não encontrado" });
+        }
+
+        const empresaId = userResult[0].EmpresaID;
+
+        const agendamentosResult = await new Promise((resolve, reject) => {
+            db.query("SELECT a.AgendamentoID AS id, a.DataAgendamento, h.Horario, u.Nome AS Usuario, s.Nome AS Servico, a.Status FROM agendamentos a JOIN horarios h ON a.HorarioID = h.HorarioID JOIN usuarios u ON a.UsuarioID = u.UsuarioID JOIN servicos s ON a.ServicoID = s.ServicoID WHERE a.EmpresaID = ?", [empresaId], (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+
+        res.send(agendamentosResult);
+    } catch (err) {
+        console.error("Erro ao buscar agendamentos da empresa:", err);
+        res.status(500).send({ success: false, error: "Erro ao buscar agendamentos da empresa" });
+    }
+};
+
+const atualizarStatusAgendamento = async (req, res) => {
+    const { id } = req.params;
+    console.log(`Atualizando status do agendamento com ID: ${id}`);
+
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query("UPDATE agendamentos SET Status = 'Confirmado' WHERE AgendamentoID = ?", [id], (err, result) => {
+                if (err) {
+                    console.error("Erro na query de atualização:", err);
+                    reject(err);
+                } else {
+                    console.log("Resultado da query de atualização:", result);
+                    resolve(result);
+                }
+            });
+        });
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ success: false, msg: "Agendamento não encontrado" });
+        }
+
+        res.send({ success: true, msg: "Status do agendamento atualizado para Confirmado" });
+    } catch (err) {
+        console.error("Erro ao atualizar status do agendamento:", err);
+        res.status(500).send({ success: false, error: "Erro ao atualizar status do agendamento" });
+    }
+};
+
+
+
+
 
 const adminRoute = (req, res) => {
     res.send('Welcome, Admin');
@@ -408,4 +474,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa };
+module.exports = { register, login, atualizarStatusAgendamento, listarAgendamentosEmpresa, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa };

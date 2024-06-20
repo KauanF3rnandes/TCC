@@ -65,7 +65,8 @@ const Servico = () => {
                     title: "Serviço cadastrado com sucesso.",
                     status: "success",
                     duration: 5000,
-                    isClosable: true
+                    isClosable: true,
+                    position: 'top-right',
                 });
                 setFormData({ titulo: '', descricao: '', duracao: '', valor: '', empresaId: '' });
             } else {
@@ -74,7 +75,8 @@ const Servico = () => {
                     description: result,
                     status: "error",
                     duration: 5000,
-                    isClosable: true
+                    isClosable: true,
+                    position: 'top-right',
                 });
             }
         } catch (error) {

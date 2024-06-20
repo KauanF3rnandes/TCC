@@ -3,13 +3,17 @@ import Header from "../../components/Header";
 import SidebarClient from "../../components/Sidebar/SidebarClient";
 import axios from 'axios';
 import "./Agendamentos.css";
-import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button, Divider, useToast } from '@chakra-ui/react';
+import { Card, CardHeader, CardBody, CardFooter, Heading, Text, Button, Divider, useToast, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from '@chakra-ui/react';
 
 const Agendamentos = () => {
     const [agendamentos, setAgendamentos] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 4;
     const toast = useToast();
+    const [agendamentoToCancel, setAgendamentoToCancel] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const onClose = () => setIsOpen(false);
+    const cancelRef = React.useRef();
 
     useEffect(() => {
         const fetchAgendamentos = async () => {
@@ -29,34 +33,45 @@ const Agendamentos = () => {
         fetchAgendamentos();
     }, []);
 
-    const deleteAgendamento = async (id) => {
-        console.log("ID do agendamento a ser excluído:", id);
+    const handleCancelAgendamento = (id) => {
+        setAgendamentoToCancel(id);
+        setIsOpen(true);
+    };
+
+    const cancelAgendamento = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:3001/main/cliente/deletar_agendamento/${id}`, {
+            await axios.put(`http://localhost:3001/auth/main/admin/agendamentos/cancelar/${agendamentoToCancel}`, null, {
                 headers: {
                     'x-access-token': token
                 }
             });
-            const updatedAgendamentos = agendamentos.filter(agendamento => agendamento.id !== id);
+            const updatedAgendamentos = agendamentos.map(agendamento => {
+                if (agendamento.AgendamentoID === agendamentoToCancel) {
+                    return { ...agendamento, Status: 'Cancelado' };
+                }
+                return agendamento;
+            });
             setAgendamentos(updatedAgendamentos);
             toast({
-                title: "Agendamento excluído com sucesso.",
+                title: "Status do agendamento atualizado para Cancelado.",
                 status: "success",
                 duration: 3000,
                 isClosable: true,
                 position: 'top-right',
             });
         } catch (error) {
-            console.error('Erro ao excluir agendamento:', error);
+            console.error('Erro ao Cancelar agendamento:', error);
             toast({
-                title: "Erro ao excluir agendamento.",
-                description: "Ocorreu um erro ao tentar excluir o agendamento. Por favor, tente novamente mais tarde.",
+                title: "Erro ao Cancelar agendamento.",
+                description: "Ocorreu um erro ao tentar Cancelar o agendamento. Por favor, tente novamente mais tarde.",
                 status: "error",
                 duration: 5000,
                 isClosable: true,
                 position: 'top-right',
             });
+        } finally {
+            setIsOpen(false);
         }
     };
 
@@ -86,19 +101,20 @@ const Agendamentos = () => {
                 <h1 className="title-agendamentos">SEUS AGENDAMENTOS:</h1>
                 <div className="grid-container">
                     {currentItems.map(agendamento => (
-                        <Card className="card-agendamentos" key={agendamento.id}>
+                        <Card className="card-agendamentos" key={agendamento.AgendamentoID}>
                             <CardHeader>
                                 <Heading size='md'>{new Date(agendamento.DataAgendamento).toLocaleDateString('pt-BR')}</Heading>
                             </CardHeader>
                             <Divider/>
                             <CardBody>
+                                <Text className="card-text">ID: {agendamento.AgendamentoID}</Text>
                                 <Text className="card-text">Usuário: {agendamento.Usuario}</Text>
                                 <Text className="card-text">Empresa: {agendamento.Empresa}</Text>
                                 <Text className="card-text">Horário: {agendamento.Horario}</Text>
                                 <Text className="card-text">Status: {agendamento.Status}</Text>
                             </CardBody>
                             <CardFooter>
-                                <Button color={"white"} bg={"red"} onClick={() => deleteAgendamento(agendamento.id)}>Excluir</Button>
+                                <Button color={"white"} bg={"red"} onClick={() => handleCancelAgendamento(agendamento.AgendamentoID)}>Excluir</Button>
                             </CardFooter>
                         </Card>
                     ))}
@@ -108,6 +124,33 @@ const Agendamentos = () => {
                     <Button color={"white"} bg="#333" onClick={nextPage} disabled={currentPage === totalPages || currentItems.length < itemsPerPage}>Próxima</Button>
                 </div>
             </div>
+
+            <AlertDialog
+                isOpen={isOpen}
+                leastDestructiveRef={cancelRef}
+                onClose={onClose}
+            >
+                <AlertDialogOverlay>
+                    <AlertDialogContent>
+                        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+                            Cancelar Agendamento
+                        </AlertDialogHeader>
+
+                        <AlertDialogBody>
+                            Tem certeza que deseja cancelar este agendamento?
+                        </AlertDialogBody>
+
+                        <AlertDialogFooter>
+                            <Button ref={cancelRef} onClick={onClose}>
+                                Não
+                            </Button>
+                            <Button colorScheme="red" onClick={cancelAgendamento} ml={3}>
+                                Sim
+                            </Button>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialogOverlay>
+            </AlertDialog>
         </div>
     );
 };

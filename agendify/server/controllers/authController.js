@@ -280,20 +280,6 @@ const listarAgendamentos = (req, res) => {
     });
 };
 
-const deletarAgendamento = (req, res) => {
-    const agendamentoId = req.params.agendamentoId;
-
-    db.query("DELETE FROM Agendamentos WHERE AgendamentoID = ?", [agendamentoId], (err, result) => {
-        if (err) {
-            console.error("Erro ao deletar agendamento:", err);
-            return res.status(500).send("Erro ao deletar agendamento");
-        }
-        console.log("Agendamento deletado com sucesso");
-        res.send("Agendamento deletado com sucesso");
-    });
-};
-
-
 const listarHorariosDaEmpresa = async (req, res) => {
     const userId = req.userId;
 
@@ -418,7 +404,20 @@ const listarAgendamentosEmpresa = async (req, res) => {
         const empresaId = userResult[0].EmpresaID;
 
         const agendamentosResult = await new Promise((resolve, reject) => {
-            db.query("SELECT a.AgendamentoID AS id, a.DataAgendamento, h.Horario, u.Nome AS Usuario, s.Nome AS Servico, a.Status FROM agendamentos a JOIN horarios h ON a.HorarioID = h.HorarioID JOIN usuarios u ON a.UsuarioID = u.UsuarioID JOIN servicos s ON a.ServicoID = s.ServicoID WHERE a.EmpresaID = ?", [empresaId], (err, result) => {
+            db.query(`
+                SELECT 
+                    a.AgendamentoID AS AgendamentoID, 
+                    a.DataAgendamento, 
+                    h.Horario, 
+                    u.Nome AS Cliente, 
+                    s.Nome AS Servico, 
+                    a.Status 
+                FROM agendamentos a 
+                JOIN horarios h ON a.HorarioID = h.HorarioID 
+                JOIN usuarios u ON a.UsuarioID = u.UsuarioID 
+                JOIN servicos s ON a.ServicoID = s.ServicoID 
+                WHERE a.EmpresaID = ?
+            `, [empresaId], (err, result) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -433,6 +432,7 @@ const listarAgendamentosEmpresa = async (req, res) => {
         res.status(500).send({ success: false, error: "Erro ao buscar agendamentos da empresa" });
     }
 };
+
 
 const atualizarStatusAgendamento = async (req, res) => {
     const { id } = req.params;
@@ -463,7 +463,33 @@ const atualizarStatusAgendamento = async (req, res) => {
 };
 
 
+const cancelarStatusAgendamento = async (req, res) => {
+    const { id } = req.params;
+    console.log(`Atualizando status do agendamento com ID: ${id}`);
 
+    try {
+        const result = await new Promise((resolve, reject) => {
+            db.query("UPDATE agendamentos SET Status = 'Cancelado' WHERE AgendamentoID = ?", [id], (err, result) => {
+                if (err) {
+                    console.error("Erro na query de atualização:", err);
+                    reject(err);
+                } else {
+                    console.log("Resultado da query de atualização:", result);
+                    resolve(result);
+                }
+            });
+        });
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ success: false, msg: "Agendamento não encontrado" });
+        }
+
+        res.send({ success: true, msg: "Status do agendamento atualizado para Cancelado" });
+    } catch (err) {
+        console.error("Erro ao atualizar status do agendamento:", err);
+        res.status(500).send({ success: false, error: "Erro ao atualizar status do agendamento" });
+    }
+};
 
 
 const adminRoute = (req, res) => {
@@ -474,4 +500,4 @@ const clientRoute = (req, res) => {
     res.send('Welcome, Client');
 };
 
-module.exports = { register, login, atualizarStatusAgendamento, listarAgendamentosEmpresa, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, deletarAgendamento, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa };
+module.exports = { register, login, cancelarStatusAgendamento, atualizarStatusAgendamento, listarAgendamentosEmpresa, cadastro_empresa, verifyJWT, roleMiddleware, adminRoute, clientRoute, listarEmpresas, cadastrarHorario, listarHorariosDisponiveis, getUser, registrarAgendamento, listarAgendamentos, listarHorariosDaEmpresa, deletarHorario, listarEmpresaUsuarioLogado, cadastrarServico, listarServicosDaEmpresa };

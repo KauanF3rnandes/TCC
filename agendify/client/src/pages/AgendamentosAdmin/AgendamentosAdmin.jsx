@@ -2,14 +2,23 @@ import React, { useState, useEffect } from "react";
 import Header from "../../components/Header";
 import Sidebar from '../../components/Sidebar/SidebarAdmin';
 import axios from 'axios';
-import { Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer, Button, useToast, Box, Flex, Heading } from '@chakra-ui/react';
+import {
+    Table, Thead, Tbody, Tr, Th, Td, TableCaption, TableContainer,
+    Button, useToast, Box, Heading, Modal, ModalOverlay,
+    ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton,
+    useDisclosure, Text, Input, InputGroup, InputRightElement, IconButton
+} from '@chakra-ui/react';
+import { SearchIcon } from '@chakra-ui/icons';
 import "./AgendamentosAdmin.css";
 
 const AgendamentosAdmin = () => {
     const [agendamentos, setAgendamentos] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [filteredAgendamentos, setFilteredAgendamentos] = useState([]);
     const [agendamentoToConfirm, setAgendamentoToConfirm] = useState(null);
-    const itemsPerPage = 4;
+    const [agendamentoToCancel, setAgendamentoToCancel] = useState(null);
+    const [filterDate, setFilterDate] = useState("");
+    const { isOpen: isConfirmModalOpen, onOpen: onConfirmModalOpen, onClose: onConfirmModalClose } = useDisclosure();
+    const { isOpen: isCancelModalOpen, onOpen: onCancelModalOpen, onClose: onCancelModalClose } = useDisclosure();
     const toast = useToast();
 
     useEffect(() => {
@@ -25,62 +34,29 @@ const AgendamentosAdmin = () => {
                 }
             });
             setAgendamentos(response.data);
+            setFilteredAgendamentos(response.data);
         } catch (error) {
             console.error('Erro ao buscar agendamentos:', error);
         }
     };
 
-    const deleteAgendamento = async (id) => {
-        console.log("ID do agendamento a ser excluído:", id);
+    const handleConfirmAgendamento = async () => {
+        if (!agendamentoToConfirm) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:3001/auth/main/admin/deletar_agendamento/${id}`, {
-                headers: {
-                    'x-access-token': token
-                }
-            });
-            const updatedAgendamentos = agendamentos.filter(agendamento => agendamento.AgendamentoID !== id);
-            setAgendamentos(updatedAgendamentos);
-            toast({
-                title: "Agendamento excluído com sucesso.",
-                status: "success",
-                duration: 3000,
-                isClosable: true,
-                position: 'top-right',
-            });
-        } catch (error) {
-            console.error('Erro ao excluir agendamento:', error);
-            toast({
-                title: "Erro ao excluir agendamento.",
-                description: "Ocorreu um erro ao tentar excluir o agendamento. Por favor, tente novamente mais tarde.",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: 'top-right',
-            });
-        }
-    };
-
-    const handleConfirmAgendamento = async (id) => {
-        setAgendamentoToConfirm(id);
-        await confirmAgendamento(id); // Passe o ID diretamente
-    };
-    
-    const confirmAgendamento = async (id) => {
-        try {
-            const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3001/auth/main/admin/agendamentos/confirmar/${id}`, null, {
+            await axios.put(`http://localhost:3001/auth/main/admin/agendamentos/confirmar/${agendamentoToConfirm}`, null, {
                 headers: {
                     'x-access-token': token
                 }
             });
             const updatedAgendamentos = agendamentos.map(agendamento => {
-                if (agendamento.AgendamentoID === id) {
+                if (agendamento.AgendamentoID === agendamentoToConfirm) {
                     return { ...agendamento, Status: 'Confirmado' };
                 }
                 return agendamento;
             });
             setAgendamentos(updatedAgendamentos);
+            setFilteredAgendamentos(updatedAgendamentos);
             toast({
                 title: "Status do agendamento atualizado para Confirmado.",
                 status: "success",
@@ -88,6 +64,7 @@ const AgendamentosAdmin = () => {
                 isClosable: true,
                 position: 'top-right',
             });
+            onConfirmModalClose();
         } catch (error) {
             console.error('Erro ao confirmar agendamento:', error);
             toast({
@@ -100,37 +77,82 @@ const AgendamentosAdmin = () => {
             });
         }
     };
-    
 
-    const totalPages = Math.ceil(agendamentos.length / itemsPerPage);
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = agendamentos.slice(indexOfFirstItem, indexOfLastItem);
-
-    const nextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage(currentPage + 1);
+    const handleCancelAgendamento = async () => {
+        if (!agendamentoToCancel) return;
+        try {
+            const token = localStorage.getItem('token');
+            await axios.put(`http://localhost:3001/auth/main/admin/agendamentos/cancelar/${agendamentoToCancel}`, null, {
+                headers: {
+                    'x-access-token': token
+                }
+            });
+            const updatedAgendamentos = agendamentos.map(agendamento => {
+                if (agendamento.AgendamentoID === agendamentoToCancel) {
+                    return { ...agendamento, Status: 'Cancelado' };
+                }
+                return agendamento;
+            });
+            setAgendamentos(updatedAgendamentos);
+            setFilteredAgendamentos(updatedAgendamentos);
+            toast({
+                title: "Status do agendamento atualizado para Cancelado.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: 'top-right',
+            });
+            onCancelModalClose();
+        } catch (error) {
+            console.error('Erro ao Cancelar agendamento:', error);
+            toast({
+                title: "Erro ao Cancelar agendamento.",
+                description: "Ocorreu um erro ao tentar Cancelar o agendamento. Por favor, tente novamente mais tarde.",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: 'top-right',
+            });
         }
     };
 
-    const prevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-        }
+    const handleFilterChange = (event) => {
+        setFilterDate(event.target.value);
+    };
+
+    const handleFilter = () => {
+        const filtered = agendamentos.filter(agendamento =>
+            agendamento.DataAgendamento.includes(filterDate)
+        );
+        setFilteredAgendamentos(filtered);
     };
 
     return (
         <Box>
-            <Header />  
+            <Header />
             <Sidebar />
             <Box className="container-agendamentos" p={5}>
                 <Heading as="h1" size="lg" mb={5}>AGENDAMENTOS DA EMPRESA</Heading>
-                <TableContainer>
+                <InputGroup width={'auto'} mb={5}>
+                    <Input
+                        type="date"
+                        value={filterDate}
+                        onChange={handleFilterChange}
+                        placeholder="Filtrar por data"
+                    />
+                    <InputRightElement>
+                        <IconButton
+                            aria-label="Search database"
+                            icon={<SearchIcon />}
+                            onClick={handleFilter}
+                        />
+                    </InputRightElement>
+                </InputGroup>
+                <TableContainer border='1px' maxHeight="360px" overflowY="auto">
                     <Table variant="striped" colorScheme="teal">
-                        <TableCaption>Lista de Agendamentos</TableCaption>
                         <Thead border='1px' bgColor={"black"}>
                             <Tr>
+                                <Th color={"white"}>ID</Th>
                                 <Th color={"white"}>Data</Th>
                                 <Th color={"white"}>Cliente</Th>
                                 <Th color={"white"}>Serviço</Th>
@@ -140,27 +162,54 @@ const AgendamentosAdmin = () => {
                             </Tr>
                         </Thead>
                         <Tbody border='1px'>
-                            {currentItems.map(agendamento => (
+                            {filteredAgendamentos.map(agendamento => (
                                 <Tr key={agendamento.AgendamentoID}>
+                                    <Td>{agendamento.AgendamentoID}</Td>
                                     <Td>{new Date(agendamento.DataAgendamento).toLocaleDateString('pt-BR')}</Td>
                                     <Td>{agendamento.Cliente}</Td>
                                     <Td>{agendamento.Servico}</Td>
                                     <Td>{agendamento.Horario}</Td>
                                     <Td>{agendamento.Status}</Td>
-                                    <Td>    
-                                        <Button mr={5} colorScheme="teal" onClick={() => handleConfirmAgendamento(agendamento.AgendamentoID)}>Confirmar</Button>
-                                        <Button colorScheme="red" onClick={() => deleteAgendamento(agendamento.AgendamentoID)}>Excluir</Button>
+                                    <Td>
+                                        <Button mr={5} colorScheme="teal" onClick={() => { setAgendamentoToConfirm(agendamento.AgendamentoID); onConfirmModalOpen(); }}>Confirmar</Button>
+                                        <Button colorScheme="red" onClick={() => { setAgendamentoToCancel(agendamento.AgendamentoID); onCancelModalOpen(); }}>Cancelar</Button>
                                     </Td>
                                 </Tr>
                             ))}
                         </Tbody>
                     </Table>
                 </TableContainer>
-                <Flex mt={5} justifyContent="space-between">
-                    <Button onClick={prevPage} disabled={currentPage === 1}>Anterior</Button>
-                    <Button onClick={nextPage} disabled={currentPage === totalPages || currentItems.length < itemsPerPage}>Próxima</Button>
-                </Flex>
             </Box>
+
+            <Modal isOpen={isConfirmModalOpen} onClose={onConfirmModalClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Confirmar Agendamento</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        Tem certeza que deseja confirmar este agendamento?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme="teal" onClick={handleConfirmAgendamento}>Confirmar</Button>
+                        <Button variant="ghost" onClick={onConfirmModalClose}>Cancelar</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Modal isOpen={isCancelModalOpen} onClose={onCancelModalClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Cancelar Agendamento</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        Tem certeza que deseja cancelar este agendamento?
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button colorScheme="red" onClick={handleCancelAgendamento}>Cancelar</Button>
+                        <Button variant="ghost" onClick={onCancelModalClose}>Voltar</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     );
 };
